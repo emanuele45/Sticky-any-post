@@ -1,0 +1,419 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<license>
+		<!--
+		/**
+		 * Sticky any Post (SaP)
+		 *
+		 * @package SaP
+		 * @author emanuele
+		 * @copyright 2011 emanuele, Simple Machines
+		 * @license http://www.simplemachines.org/about/smf/license.php BSD
+		 *
+		 * @version 0.1.4
+		 */
+		-->
+	</license>
+
+	<id>emanuele:sticky_any_post</id>
+	<version>0.1.4</version>
+
+	<file name="$sourcedir/ManagePosts.php">
+		<operation><!-- 1 -->
+			<search position="before"><![CDATA[
+			array('check', 'enableStickyTopics'),]]></search>
+			<add><![CDATA[
+			array('check', 'enable_sticky_message'),]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Post.php">
+		<operation><!-- 1 -->
+			<search position="before"><![CDATA[
+				t.id_first_msg]]></search>
+			<add><![CDATA[, t.sticky_message]]></add>
+		</operation>
+		<operation><!-- 2 -->
+			<search position="before"><![CDATA[
+		list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg]]></search>
+			<add><![CDATA[, $sticky_message]]></add>
+		</operation>
+		<operation><!-- 3 -->
+			<search position="before"><![CDATA[
+		$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;]]></search>
+			<add><![CDATA[
+		$sticky_message = !empty($sticky_message) ? unserialize($sticky_message) : array('id_msg' => 0, 'id_member' => 0);
+		$context['sticky_message'] = isset($_REQUEST['sticky_message']) ? !empty($_REQUEST['sticky_message']) : (isset($_REQUEST['msg']) ? ($_REQUEST['msg'] == $sticky_message['id_msg']) : 0);
+		$context['can_sticky_msg'] = allowedTo('make_sticky') && !empty($modSettings['enable_sticky_message']);
+]]></add>
+		</operation>
+		<operation><!-- 4 -->
+			<search position="after"><![CDATA[
+		$context['sticky'] = !empty($_REQUEST['sticky']);]]></search>
+			<add><![CDATA[
+		$context['sticky_message'] = !empty($_REQUEST['sticky_message']);
+		$context['can_sticky_msg'] = allowedTo('make_sticky') && !empty($modSettings['enable_sticky_message']);
+]]></add>
+		</operation>
+		<operation><!-- 5 -->
+			<search position="before"><![CDATA[
+			SELECT locked, is_sticky, id_poll, approved, id_first_msg, id_last_msg, id_member_started, id_board]]></search>
+			<add><![CDATA[, sticky_message]]></add>
+		</operation>
+		<operation><!-- 6 -->
+			<search position="after"><![CDATA[
+		// So you wanna (un)sticky this...let's see.]]></search>
+			<add><![CDATA[
+		$topic_info['sticky_message'] = !empty($topic_info['sticky_message']) ? unserialize($topic_info['sticky_message']) : array('id_msg' => 0, 'id_member' => 0);
+		if (isset($_POST['sticky_message']) && (empty($modSettings['enable_sticky_message']) || !allowedTo('make_sticky')))
+			unset($_POST['sticky_message']);
+]]></add>
+		</operation>
+		<operation><!-- 7 -->
+			<search position="after"><![CDATA[
+		if (isset($_POST['sticky']) && (empty($modSettings['enableStickyTopics']) || empty($_POST['sticky']) || !allowedTo('make_sticky')))]]></search>
+			<add><![CDATA[
+		if (isset($_POST['sticky_message']) && (empty($modSettings['enable_sticky_message']) || empty($_POST['sticky_message']) || !allowedTo('make_sticky')))
+			unset($_POST['sticky_message']);
+]]></add>
+		</operation>
+		<operation><!-- 8 -->
+			<search position="replace"><![CDATA[
+			SELECT id_member, poster_name, poster_email, poster_time, approved
+			FROM {db_prefix}messages
+]]></search>
+			<add><![CDATA[
+			SELECT id_member, poster_name, poster_email, poster_time, m.approved, t.sticky_message
+			FROM {db_prefix}messages as m
+			LEFT JOIN {db_prefix}topics as t ON (t.id_topic = m.id_topic)
+]]></add>
+		</operation>
+		<operation><!-- 9 -->
+			<search position="after"><![CDATA[
+		if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
+]]></search>
+			<add><![CDATA[
+		$row['sticky_message'] = isset($row['sticky_message']) ? unserialize($row['sticky_message']) : array('id_msg' => 0, 'id_member' => 0);
+]]></add>
+		</operation>
+		<operation><!-- 10 -->
+			<search position="after"><![CDATA[
+		// Change the sticky status of this topic?]]></search>
+			<add><![CDATA[
+		if (isset($_POST['sticky_message']) && (!allowedTo('make_sticky') || $_REQUEST['msg'] == $row['sticky_message']['id_msg']))
+			unset($_POST['sticky_message']);
+]]></add>
+		</operation>
+		<operation><!-- 11 -->
+			<search position="before"><![CDATA[
+		'sticky_mode' => isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : null,]]></search>
+			<add><![CDATA[
+		'message_sticky' => isset($_POST['sticky_message']) && !empty($modSettings['enable_sticky_message']) ? (int) $_POST['sticky_message'] : null,
+]]></add>
+		</operation>
+		<operation><!-- 12 -->
+			<search position="after"><![CDATA[
+	// Editing or posting an event?]]></search>
+			<add><![CDATA[
+	posting_message_sticky($msgOptions['id'], $topicOptions['id']);
+]]></add>
+		</operation>
+		<operation><!-- 13 -->
+			<search position="before"><![CDATA[
+			'sticky_mode' => isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : null,]]></search>
+			<add><![CDATA[
+			'message_sticky' => isset($_POST['sticky_message']) && !empty($modSettings['enable_sticky_message']) ? (int) $_POST['sticky_message'] : null,]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Display.php">
+		<operation><!-- 1 -->
+			<search position="before"><![CDATA[
+			t.num_replies, t.num_views, t.locked, ms.subject, t.is_sticky, t.id_poll,]]></search>
+			<add><![CDATA[ t.sticky_message,]]></add>
+		</operation>
+		<operation><!-- 2 -->
+			<search position="before"><![CDATA[
+	$context['topic_last_message'] = $topicinfo['id_last_msg'];]]></search>
+			<add><![CDATA[
+	$topicinfo['sticky_message'] = !empty($topicinfo['sticky_message']) ? unserialize($topicinfo['sticky_message']) : array('id_msg' => 0, 'id_member' => 0);
+	$context['sticky_message'] = $topicinfo['sticky_message']['id_msg'];
+]]></add>
+		</operation>
+		<operation><!-- 3 -->
+			<search position="before"><![CDATA[
+		$messages[] = $row['id_msg'];
+	}]]></search>
+			<add><![CDATA[
+	if (!empty($modSettings['enable_sticky_message'])) {
+		if (!empty($topicinfo['sticky_message']['id_msg'])) {
+			$firstIndex = 0;
+			$all_posters[$topicinfo['sticky_message']['id_msg']] = $topicinfo['sticky_message']['id_member'];
+			$context['sticky_any_post_replicate'] = (min($messages[0], end($messages)) <= $topicinfo['sticky_message']['id_msg'] && $topicinfo['sticky_message']['id_msg'] <= max($messages[0], end($messages)));
+			array_unshift($messages, $topicinfo['sticky_message']['id_msg']);
+		}
+		$context['id_message_list'] = $messages;
+		$context['id_msg_to_seek'] = array();
+		for ($i=count($context['id_message_list'])-1;$i>-1;$i--) {
+			if (count(array_keys($context['id_message_list'], $topicinfo['sticky_message']['id_msg'])) == 2)
+				$skip = !empty($skip) ? $skip : ($topicinfo['sticky_message']['id_msg'] != $context['id_message_list'][$i] ? false : true);
+			else
+				$skip = true;
+			$context['id_msg_to_seek'][$context['id_message_list'][$i]] = $i - ($skip ? 0 : 1);
+		}
+	}
+]]></add>
+		</operation>
+		<operation><!-- 4 -->
+			<search position="replace"><![CDATA[
+			ORDER BY id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+			array(
+				'message_list' => $messages,
+				'new_from' => $topicinfo['new_from'],
+]]></search>
+			<add><![CDATA[
+			ORDER BY ' . (empty($topicinfo['sticky_message']['id_msg']) || empty($modSettings['enable_sticky_message']) ? 'id_msg ' : 'FIELD(id_msg, {int:sticky_msg}) DESC, id_msg ') . (empty($options['view_newest_first']) ? '' : ' DESC'),
+			array(
+				'message_list' => $messages,
+				'new_from' => $topicinfo['new_from'],
+				'sticky_msg' => $topicinfo['sticky_message']['id_msg'],
+]]></add>
+		</operation>
+		<operation><!-- 5 -->
+			<search position="after"><![CDATA[
+	$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);]]></search>
+			<add><![CDATA[
+	$context['can_sticky_msg'] = allowedTo('make_sticky') && !empty($modSettings['enable_sticky_message']);]]></add>
+		</operation>
+		<operation><!-- 6 -->
+			<search position="before"><![CDATA[
+	static $counter = null;]]></search>
+			<add><![CDATA[
+	static $stickyed_message = null;
+	static $sticky_counter = -1;]]></add>
+		</operation>
+		<operation><!-- 7 -->
+			<search position="replace"><![CDATA[
+		$counter = empty($options['view_newest_first']) ? $context['start'] - (!empty($topicinfo['sticky_message']['id_msg']) ? 1 : 0) : $context['total_visible_posts'] - $context['start'];
+
+	// Start from the beginning...
+	if ($reset)
+		return @$smcFunc['db_data_seek']($messages_request, 0);
+
+	// Attempt to get the next message.
+	$message = $smcFunc['db_fetch_assoc']($messages_request);
+	if (!$message)
+	{
+		$smcFunc['db_free_result']($messages_request);
+		return false;
+	}
+]]></search>
+			<add><![CDATA[
+		$counter = empty($options['view_newest_first']) ? $context['start'] - 1 : $context['total_visible_posts'] - $context['start'];
+
+	// Start from the beginning...
+	if ($reset){
+		$stickyed_message = null;
+		$sticky_counter = -1;
+		return @$smcFunc['db_data_seek']($messages_request, 0);
+	}
+
+	// Attempt to get the next message.
+	if (!empty($modSettings['enable_sticky_message']) && !empty($topicinfo['sticky_message']['id_msg']) && !empty($context['id_message_list'])) {
+		@$smcFunc['db_data_seek']($messages_request, $context['id_msg_to_seek'][$context['id_message_list'][0]]);
+		$message = $smcFunc['db_fetch_assoc']($messages_request);
+		array_shift($context['id_message_list']);
+	} else {
+		$message = $smcFunc['db_fetch_assoc']($messages_request);
+	}
+	if (!$message)
+	{
+		$smcFunc['db_free_result']($messages_request);
+		return false;
+	}
+
+	$sticky_counter++;
+]]></add>
+		</operation>
+		<operation><!-- 8 -->
+			<search position="replace"><![CDATA[
+		'href' => $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'],
+]]></search>
+			<add><![CDATA[
+		'href' => $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . (!empty($modSettings['enable_sticky_message']) && !empty($topicinfo['sticky_message']['id_msg']) && $sticky_counter==0 ? 'top_' : '') . $message['id_msg'],
+		'is_sticky_message' => !empty($modSettings['enable_sticky_message']) && !empty($topicinfo['sticky_message']['id_msg']) && $sticky_counter==0 ? 1 : 0,
+]]></add>
+		</operation>
+	</file>
+
+
+	<file name="$themedir/Post.template.php">
+		<operation><!-- 1 -->
+			<search position="before"><![CDATA[
+							', $context['can_sticky'] ? '<li><input type="hidden" name="sticky" value="0" /><label for="check_sticky"><input type="checkbox" name="sticky" id="check_sticky"' . ($context['sticky'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['sticky_after'] . '</label></li>' : '', ']]></search>
+			<add><![CDATA[
+							', $context['can_sticky_msg'] ? '<li><input type="hidden" name="sticky_message" value="0" /><label for="check_sticky_message"><input type="checkbox" name="sticky_message" id="check_sticky_message"' . ($context['sticky_message'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['mark_sticky_msg'] . '</label></li>' : '', '
+]]></add>
+		</operation>
+	</file>
+	<file name="$themedir/Display.template.php">
+		<operation><!-- 1 -->
+			<search position="replace"><![CDATA[
+			<a id="msg', $context['first_message'], '"></a>]]></search>
+			<add><![CDATA[
+			<a id="msg', $context['sticky_message']==$context['first_message'] ? 'top_' : '', $context['first_message'], '"></a>]]></add>
+		</operation>
+		<operation><!-- 2 -->
+			<search position="replace"><![CDATA[
+		if ($message['id'] != $context['first_message'])
+]]></search>
+			<add><![CDATA[
+		if ($message['id'] != $context['first_message'] || ($message['id'] == $context['sticky_message'] && !$message['is_sticky_message']))
+]]></add>
+		</operation>
+		<operation><!-- 3 -->
+			<search position="replace"><![CDATA[
+							<ul class="reset smalltext" id="msg_', $message['id'], '_extra_info">';
+]]></search>
+			<add><![CDATA[
+							<ul class="reset smalltext" id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '_extra_info">';
+]]></add>
+		</operation>
+		<operation><!-- 4 -->
+			<search position="replace"><![CDATA[
+										<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
+]]></search>
+			<add><![CDATA[
+										<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] && !$message['is_sticky_message'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
+]]></add>
+		</operation>
+		<operation><!-- 5 -->
+			<search position="replace"><![CDATA[
+									<h5 id="subject_', $message['id'], '">
+]]></search>
+			<add><![CDATA[
+									<h5 id="subject_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '">
+]]></add>
+		</operation>
+		<operation><!-- 6 -->
+			<search position="replace"><![CDATA[
+									<div class="smalltext">&#171; <strong>', !empty($message['counter']) ? $txt['reply_noun'] . ' #' . $message['counter'] : '', ' ', $txt['on'], ':</strong> ', $message['time'], ' &#187;</div>
+]]></search>
+			<add><![CDATA[
+									<div class="smalltext">&#171; <strong>', $message['is_sticky_message'] ? $txt['sticky_post'] : (!empty($message['counter']) ? $txt['reply_noun'] . ' #' . $message['counter'] : ''), ' ', $txt['on'], ':</strong> ', $message['time'], ' &#187;</div>
+]]></add>
+		</operation>
+		<operation><!-- 7 -->
+			<search position="replace"><![CDATA[
+									<div id="msg_', $message['id'], '_quick_mod"></div>
+]]></search>
+			<add><![CDATA[
+									<div id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '_quick_mod"></div>
+]]></add>
+		</operation>
+		<operation><!-- 8 -->
+			<search position="before"><![CDATA[
+									<li class="remove_button"><a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');">', $txt['remove'], '</a></li>';]]></search>
+			<add><![CDATA[
+
+		// How about sticky it?!
+		if ($context['can_sticky_msg'])
+			echo '
+									<li class="sticky_button"><a href="', $scripturl, '?action=stickymessage;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['sticky_message']==$message['id'] ? $txt['unsticky_msg'] : $txt['sticky_msg'], '</a></li>';
+]]></add>
+		</operation>
+		<operation><!-- 9 -->
+			<search position="replace"><![CDATA[
+		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
+]]></search>
+			<add><![CDATA[
+		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'] && !$message['is_sticky_message'])
+]]></add>
+		</operation>
+		<operation><!-- 10 -->
+			<search position="replace"><![CDATA[
+							<div id="msg_', $message['id'], '_ignored_prompt">
+]]></search>
+			<add><![CDATA[
+							<div id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '_ignored_prompt">
+]]></add>
+		</operation>
+		<operation><!-- 11 -->
+			<search position="replace"><![CDATA[
+								<a href="#" id="msg_', $message['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+]]></search>
+			<add><![CDATA[
+								<a href="#" id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+]]></add>
+		</operation>
+		<operation><!-- 12 -->
+			<search position="replace"><![CDATA[
+								<div class="inner" id="msg_', $message['id'], '"', '>', $message['body'], '</div>
+]]></search>
+			<add><![CDATA[
+								<div class="inner" id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '"', '>', $message['body'], '</div>
+]]></add>
+		</operation>
+		<operation><!-- 13 -->
+			<search position="replace"><![CDATA[
+		if ($message['can_modify'])
+			echo '
+							<img]]></search>
+			<add><![CDATA[
+		if ($message['can_modify'] && !$message['is_sticky_message'])
+			echo '
+							<img]]></add>
+		</operation>
+		<operation><!-- 14 -->
+			<search position="replace"><![CDATA[
+							<div id="msg_', $message['id'], '_footer" class="attachments smalltext">
+]]></search>
+			<add><![CDATA[
+							<div id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '_footer" class="attachments smalltext">
+]]></add>
+		</operation>
+		<operation><!-- 15 -->
+			<search position="replace"><![CDATA[
+							<div class="smalltext modified" id="modified_', $message['id'], '">';
+]]></search>
+			<add><![CDATA[
+							<div class="smalltext modified" id="modified_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '">';
+]]></add>
+		</operation>
+		<operation><!-- 16 -->
+			<search position="replace"><![CDATA[
+							<div class="signature" id="msg_', $message['id'], '_signature">', $message['member']['signature'], '</div>';
+]]></search>
+			<add><![CDATA[
+							<div class="signature" id="msg_', $message['is_sticky_message'] ? 'top_' : '', $message['id'], '_signature">', $message['member']['signature'], '</div>';
+]]></add>
+		</operation>
+		<operation><!-- 17 -->
+			<search position="replace"><![CDATA[
+			echo '
+					aIgnoreToggles[', $msgid, '] = new smc_Toggle({
+]]></search>
+			<add><![CDATA[
+			$msgid = $context['sticky_message']==$msgid && !isset($skip) ? 'top_' . $msgid : $msgid;
+			$skip=true;
+			echo '
+					aIgnoreToggles[', $context['sticky_message']==$msgid && !isset($skip) ? $msgid : 0, '] = new smc_Toggle({
+]]></add>
+		</operation>
+	</file>
+
+	<file name="$themedir/css/index.css">
+		<operation><!-- 1 -->
+			<search position="before"><![CDATA[
+	background: url(../images/theme/quickbuttons.png) no-repeat 0 -210px;
+}]]></search>
+			<add><![CDATA[
+ul.quickbuttons li.sticky_button
+{
+	background: url(../images/icons/quick_sticky.gif) no-repeat;
+}
+]]></add>
+		</operation>
+	</file>
+</modification>

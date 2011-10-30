@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<license>
+		<!--
+		/**
+		 * Sticky any Post (SaP)
+		 *
+		 * @package SaP
+		 * @author emanuele
+		 * @copyright 2011 emanuele, Simple Machines
+		 * @license http://www.simplemachines.org/about/smf/license.php BSD
+		 *
+		 * @version 0.1.4
+		 */
+		-->
+	</license>
+
+	<id>emanuele:sticky_any_post</id>
+	<version>0.1.4</version>
+
+	<file name="$languagedir/Modifications.italian.php" error="skip">
+		<operation>
+			<search position="end" />
+			<add><![CDATA[
+$txt['enable_sticky_message'] = 'Abilita messaggi importanti';
+$txt['sticky_msg'] = 'Importante';
+$txt['sticky_post'] = 'Post importante';
+$txt['unsticky_msg'] = 'Normale';
+$txt['mark_sticky_msg'] = 'Imposta messaggio come importante';
+$txt['sticky_message_disabled'] = 'Spiacente, la funzione di rendere importanti i messaggi è disabilitata';
+]]></add>
+		</operation>
+	</file>
+	<file name="$languagedir/Help.italian.php" error="skip">
+		<operation>
+			<search position="end" />
+			<add><![CDATA[
+$helptxt['enable_sticky_message'] = 'Quando abilitato sarà possibile impostare un qualunque post del topic come "importante". Così impostato il messaggio verrà visualizzato per primo e ripetuto in tutte le pagine del topic';
+]]></add>
+		</operation>
+	</file>
+
+	<file name="$languagedir/Modifications.english.php">
+		<operation>
+			<search position="end" />
+			<add><![CDATA[
+$txt['enable_sticky_message'] = 'Enable sticky posts';
+$txt['sticky_msg'] = 'Sticky';
+$txt['sticky_post'] = 'Sticky post';
+$txt['unsticky_msg'] = 'Not sticky';
+$txt['mark_sticky_msg'] = 'Set post as sticky';
+$txt['sticky_message_disabled'] = 'Sorry, the sticky topic function is disabled';
+]]></add>
+		</operation>
+	</file>
+	<file name="$languagedir/Help.english.php">
+		<operation>
+			<search position="end" />
+			<add><![CDATA[
+$helptxt['enable_sticky_message'] = 'When enabled this option allows setting any post of the topic as "sticky". Once set sticky the post will be shown as the first of the topic and it will be repeated on all the pages of the topic';
+]]></add>
+		</operation>
+	</file>
+</modification>
