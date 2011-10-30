@@ -224,8 +224,10 @@
 		@$smcFunc['db_data_seek']($messages_request, $context['id_msg_to_seek'][$context['id_message_list'][0]]);
 		$message = $smcFunc['db_fetch_assoc']($messages_request);
 		array_shift($context['id_message_list']);
-	} else {
+	} elseif (!empty($context['id_message_list'])) {
 		$message = $smcFunc['db_fetch_assoc']($messages_request);
+	} else {
+		$message = false;
 	}
 	if (!$message)
 	{
