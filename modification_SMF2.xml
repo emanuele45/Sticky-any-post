@@ -195,7 +195,7 @@
 		</operation>
 		<operation><!-- 7 -->
 			<search position="replace"><![CDATA[
-		$counter = empty($options['view_newest_first']) ? $context['start'] - (!empty($topicinfo['sticky_message']['id_msg']) ? 1 : 0) : $context['total_visible_posts'] - $context['start'];
+		$counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
 
 	// Start from the beginning...
 	if ($reset)
