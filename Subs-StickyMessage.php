@@ -18,6 +18,13 @@ function stickymessage_add_action(&$actionArray)
 	$actionArray['stickymessage'] = array('Subs-StickyMessage.php', 'make_message_sticky');
 }
 
+function stickymessage_add_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions){
+	global $context;
+
+	$context['non_guest_permissions'][] = 'make_post_sticky';
+	$permissionList['board']['make_post_sticky'] = array(false, 'topic', 'moderate');
+}
+
 function posting_message_sticky($msgID, $topicID)
 {
 	if(!isset($msgID) || !isset($topicID))

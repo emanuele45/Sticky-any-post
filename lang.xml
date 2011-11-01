@@ -29,6 +29,7 @@ $txt['sticky_post'] = 'Post importante';
 $txt['unsticky_msg'] = 'Normale';
 $txt['mark_sticky_msg'] = 'Imposta messaggio come importante';
 $txt['sticky_message_disabled'] = 'Spiacente, la funzione di rendere importanti i messaggi è disabilitata';
+$txt['permissionname_make_post_sticky'] = 'Imposta post importanti';
 ]]></add>
 		</operation>
 	</file>
@@ -51,6 +52,7 @@ $txt['sticky_post'] = 'Sticky post';
 $txt['unsticky_msg'] = 'Not sticky';
 $txt['mark_sticky_msg'] = 'Set post as sticky';
 $txt['sticky_message_disabled'] = 'Sorry, the sticky topic function is disabled';
+$txt['permissionname_make_post_sticky'] = 'Make posts sticky';
 ]]></add>
 		</operation>
 	</file>

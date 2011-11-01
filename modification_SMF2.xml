@@ -45,7 +45,7 @@
 			<add><![CDATA[
 		$sticky_message = !empty($sticky_message) ? unserialize($sticky_message) : array('id_msg' => 0, 'id_member' => 0);
 		$context['sticky_message'] = isset($_REQUEST['sticky_message']) ? !empty($_REQUEST['sticky_message']) : (isset($_REQUEST['msg']) ? ($_REQUEST['msg'] == $sticky_message['id_msg']) : 0);
-		$context['can_sticky_msg'] = allowedTo('make_sticky') && !empty($modSettings['enable_sticky_message']);
+		$context['can_sticky_msg'] = allowedTo('make_post_sticky') && !empty($modSettings['enable_sticky_message']);
 ]]></add>
 		</operation>
 		<operation><!-- 4 -->
@@ -53,7 +53,7 @@
 		$context['sticky'] = !empty($_REQUEST['sticky']);]]></search>
 			<add><![CDATA[
 		$context['sticky_message'] = !empty($_REQUEST['sticky_message']);
-		$context['can_sticky_msg'] = allowedTo('make_sticky') && !empty($modSettings['enable_sticky_message']);
+		$context['can_sticky_msg'] = allowedTo('make_post_sticky') && !empty($modSettings['enable_sticky_message']);
 ]]></add>
 		</operation>
 		<operation><!-- 5 -->
@@ -66,7 +66,7 @@
 		// So you wanna (un)sticky this...let's see.]]></search>
 			<add><![CDATA[
 		$topic_info['sticky_message'] = !empty($topic_info['sticky_message']) ? unserialize($topic_info['sticky_message']) : array('id_msg' => 0, 'id_member' => 0);
-		if (isset($_POST['sticky_message']) && (empty($modSettings['enable_sticky_message']) || !allowedTo('make_sticky')))
+		if (isset($_POST['sticky_message']) && (empty($modSettings['enable_sticky_message']) || !allowedTo('make_post_sticky')))
 			unset($_POST['sticky_message']);
 ]]></add>
 		</operation>
@@ -74,7 +74,7 @@
 			<search position="after"><![CDATA[
 		if (isset($_POST['sticky']) && (empty($modSettings['enableStickyTopics']) || empty($_POST['sticky']) || !allowedTo('make_sticky')))]]></search>
 			<add><![CDATA[
-		if (isset($_POST['sticky_message']) && (empty($modSettings['enable_sticky_message']) || empty($_POST['sticky_message']) || !allowedTo('make_sticky')))
+		if (isset($_POST['sticky_message']) && (empty($modSettings['enable_sticky_message']) || empty($_POST['sticky_message']) || !allowedTo('make_post_sticky')))
 			unset($_POST['sticky_message']);
 ]]></add>
 		</operation>
@@ -101,7 +101,7 @@
 			<search position="after"><![CDATA[
 		// Change the sticky status of this topic?]]></search>
 			<add><![CDATA[
-		if (isset($_POST['sticky_message']) && (!allowedTo('make_sticky') || $_REQUEST['msg'] == $row['sticky_message']['id_msg']))
+		if (isset($_POST['sticky_message']) && (!allowedTo('make_post_sticky') || $_REQUEST['msg'] == $row['sticky_message']['id_msg']))
 			unset($_POST['sticky_message']);
 ]]></add>
 		</operation>
@@ -184,7 +184,7 @@
 			<search position="after"><![CDATA[
 	$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);]]></search>
 			<add><![CDATA[
-	$context['can_sticky_msg'] = allowedTo('make_sticky') && !empty($modSettings['enable_sticky_message']);]]></add>
+	$context['can_sticky_msg'] = allowedTo('make_post_sticky') && !empty($modSettings['enable_sticky_message']);]]></add>
 		</operation>
 		<operation><!-- 6 -->
 			<search position="before"><![CDATA[
