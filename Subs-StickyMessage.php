@@ -7,7 +7,7 @@
  * @copyright 2011 emanuele, Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 0.1.4
+ * @version 0.1.5
  */
 
 if (!defined('SMF'))

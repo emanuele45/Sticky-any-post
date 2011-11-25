@@ -11,13 +11,13 @@
 		 * @copyright 2011 emanuele, Simple Machines
 		 * @license http://www.simplemachines.org/about/smf/license.php BSD
 		 *
-		 * @version 0.1.4
+		 * @version 0.1.5
 		 */
 		-->
 	</license>
 
 	<id>emanuele:sticky_any_post</id>
-	<version>0.1.4</version>
+	<version>0.1.5</version>
 
 	<file name="$languagedir/Modifications.italian-utf8.php" error="skip">
 		<operation>

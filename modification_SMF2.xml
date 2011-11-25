@@ -11,13 +11,12 @@
 		 * @copyright 2011 emanuele, Simple Machines
 		 * @license http://www.simplemachines.org/about/smf/license.php BSD
 		 *
-		 * @version 0.1.4
+		 * @version 0.1.5
 		 */
 		-->
 	</license>
 
 	<id>emanuele:sticky_any_post</id>
-	<version>0.1.4</version>
 
 	<file name="$sourcedir/ManagePosts.php">
 		<operation><!-- 1 -->
@@ -224,7 +223,7 @@
 		@$smcFunc['db_data_seek']($messages_request, $context['id_msg_to_seek'][$context['id_message_list'][0]]);
 		$message = $smcFunc['db_fetch_assoc']($messages_request);
 		array_shift($context['id_message_list']);
-	} elseif (!empty($context['id_message_list'])) {
+	} elseif (!empty($context['id_message_list']) || empty($modSettings['enable_sticky_message'])) {
 		$message = $smcFunc['db_fetch_assoc']($messages_request);
 	} else {
 		$message = false;
