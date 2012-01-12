@@ -24,14 +24,13 @@
 		<modification>lang.xml</modification>
 		<modification>lang-UTF8.xml</modification>
 		<database>installScript_SMF2.php</database>
-		<database>installHooks.php</database>
+		<code>installHooks.php</code>
 		<require-file name="Subs-StickyMessage.php" destination="$sourcedir" />
 	</install>
 	<uninstall for="2.0 - 2.0.99">
 		<modification reverse="true">modification_SMF2.xml</modification>
 		<modification reverse="true">lang.xml</modification>
 		<modification reverse="true">lang-UTF8.xml</modification>
-		<database>installScript_SMF2.php</database>
 		<code>installHooks.php</code>
 		<remove-file name="$sourcedir/Subs-StickyMessage.php" />
 	</uninstall>
